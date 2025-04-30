@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محفظة TRX المتكاملة - المستخدم والمسؤول</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --dark: #2d2d2d;
+            --light: #f8f9fa;
+            --radius: 15px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+        body { background: var(--light); min-height: 100vh; }
+        .container { max-width: 500px; margin: 0 auto; padding: 20px 20px 80px; }
+        .page { display: none; animation: slideIn 0.3s ease; }
+        .page.active { display: block; }
+        .card { background: white; border-radius: var(--radius); padding: 25px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .input-field { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: var(--radius); margin: 10px 0; transition: all 0.3s; }
+        .input-field:focus { border-color: var(--primary); outline: none; }
+        .btn { display: block; width: 100%; padding: 15px; border: none; border-radius: var(--radius); font-size: 16px; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(45deg, var(--primary), var(--secondary)); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: var(--dark); }
+        .nav-tabs { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 15px 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
+        .tab-item { position: relative; text-align: center; padding: 10px 20px; border-radius: var(--radius); cursor: pointer; transition: all 0.3s; }
+        .tab-item.active { background: var(--primary); color: white; }
+        .notification-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        .transaction-item, .vote-item, .asset-item { background: white; padding: 15px; border-radius: var(--radius); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.3s; }
+        .stats-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0; }
+        .stat-item { background: white; padding: 15px; border-radius: var(--radius); text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .admin-card { background: linear-gradient(45deg, var(--dark), #424242); color: white; }
+        .admin-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .admin-table th, .admin-table td { padding: 10px; text-align: right; border-bottom: 1px solid #444; }
+        .admin-table th { background-color: rgba(255,255,255,0.1); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <!-- User and Admin Pages -->
+    <div class="container page" id="loginPage">
+        <div class="card">
+            <h2 style="text-align:center;margin-bottom:20px;">تسجيل الدخول</h2>
+            <input type="text" class="input-field" placeholder="البريد الإلكتروني أو رقم الهاتف" id="loginId">
+            <input type="password" class="input-field" placeholder="كلمة المرور" id="loginPassword">
+            <button class="btn btn-primary" onclick="login()">تسجيل الدخول</button>
+            <p style="text-align:center;margin-top:15px;cursor:pointer;" onclick="showPage('registerPage')">إنشاء حساب جديد</p>
+            <p style="text-align:center;margin-top:10px;cursor:pointer;" onclick="showPage('adminLoginPage')">دخول المسؤول</p>
+        </div>
+    </div>
+
+    <div class="container page" id="registerPage">
+        <div class="card">
+            <h2 style="text-align:center;margin-bottom:20px;">إنشاء حساب جديد</h2>
+            <input type="text" class="input-field" placeholder="الاسم الرباعي" id="fullName">
+            <input type="email" class="input-field" placeholder="البريد الإلكتروني" id="email">
+            <input type="tel" class="input-field" placeholder="رقم الهاتف" id="phone">
+            <input type="password" class="input-field" placeholder="كلمة المرور" id="password">
+            <input type="password" class="input-field" placeholder="تأكيد كلمة المرور" id="confirmPassword">
+            <button class="btn btn-primary" onclick="register()">إنشاء حساب</button>
+            <p style="text-align:center;margin-top:15px;cursor:pointer;" onclick="showPage('loginPage')">لديك حساب؟ تسجيل الدخول</p>
+        </div>
+    </div>
+
+    <div class="container page" id="adminLoginPage">
+        <div class="card">
+            <h2 style="text-align:center;margin-bottom:20px;">دخول المسؤول</h2>
+            <input type="password" class="input-field" placeholder="كلمة المرور الإدارية" id="adminPassword">
+            <button class="btn btn-primary" onclick="adminLogin()">دخول</button>
+            <p style="text-align:center;margin-top:15px;cursor:pointer;" onclick="showPage('loginPage')">العودة لتسجيل المستخدم</p>
+        </div>
+    </div>
+
+    <!-- Common Nav Tabs for User Pages -->
+    <div class="nav-tabs" id="userNav">
+        <div class="tab-item active" onclick="showPage('walletPage')"><i class="fas fa-home"></i></div>
+        <div class="tab-item" onclick="showPage('transactionsPage')"><i class="fas fa-exchange-alt"></i></div>
+        <div class="tab-item" onclick="showPage('votePage')"><i class="fas fa-vote-yea"></i></div>
+        <div class="tab-item" onclick="showPage('profilePage')"><i class="fas fa-user"></i></div>
+    </div>
+
+    <!-- Wallet Page -->
+    <div class="container page" id="walletPage">
+        <div class="card">
+            <div style="text-align:center;"><h3 id="userName"></h3><p style="color:#666;margin-top:10px;" id="walletAddress"></p></div>
+            <div style="text-align:center;margin:20px 0;"><h2 style="color:var(--primary);" id="balanceTRX">0 TRX</h2><p style="color:#666;" id="balanceUSD">$0.00</p></div>
+            <div class="stats-container">
+                <div class="stat-item"><small>الطاقة</small><h3 id="energyValue">0</h3></div>
+                <div class="stat-item"><small>النطاق</small><h3 id="bandwidthValue">0</h3></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+                <button class="btn btn-primary" onclick="showPage('sendPage')">إرسال</button>
+                <button class="btn btn-success" onclick="showPage('receivePage')">استلام</button>
+                <button class="btn btn-primary" onclick="showPage('votePage')">تصويت</button>
+                <button class="btn btn-success" onclick="stakeFunds()">Stake</button>
+            </div>
+            <div style="margin-top:20px;"><h4 style="margin-bottom:15px;">الأصول</h4><div class="asset-list" id="assetsList"></div></div>
+        </div>
+    </div>
+
+    <!-- Send Page -->
+    <div class="container page" id="sendPage">
+        <div class="card">
+            <h2 style="text-align:center;margin-bottom:20px;">إرسال أموال</h2>
+            <select class="input-field" id="sendCurrency"><option value="TRX">TRX</option><option value="USDT">USDT</option><option value="USDD">USDD</option></select>
+            <input type="text" class="input-field" placeholder="عنوان المحفظة المستقبلة" id="receiverAddress">
+            <input type="number" class="input-field" placeholder="المبلغ" id="sendAmount">
+            <button class="btn btn-primary" onclick="sendFunds()">إرسال الآن</button>
+            <p style="text-align:center;margin-top:15px;cursor:pointer;" onclick="showPage('walletPage')">رجوع</p>
+        </div>
+    </div>
+
+    <!-- Receive Page -->
+    <div class="container page" id="receivePage">
+        <div class="card">
+            <h2 style="text-align:center;margin-bottom:20px;">استلام أموال</h2>
+            <div style="text-align:center;margin:20px 0;"><p style="font-weight:bold;" id="receiveAddress"></p><div style="background:#eee;padding:15px;border-radius:var(--radius);margin:20px 0;"><i class="fas fa-qrcode" style="font-size:100px;"></i></div><p style="color:#666;">استخدم هذا العنوان لاستلام الأموال</p></div>
+            <p style="text-align:center;cursor:pointer;" onclick="showPage('walletPage')">رجوع</p>
+        </div>
+    </div>
+
+    <!-- Transactions Page -->
+    <div class="container page" id="transactionsPage">
+        <div class="card">
+            <h2 style="text-align:center;">سجل المعاملات</h2>
+            <div style="display:flex;gap:10px;margin:15px 0;"><button class="btn btn-primary" onclick="filterTransactions('all')">الكل</button><button class="btn btn-success" onclick="filterTransactions('received')">الواردة</button><button class="btn btn-danger" onclick="filterTransactions('sent')">الصادرة</button></div>
+            <div id="transactionsContainer"></div>
+            <p style="text-align:center;margin-top:15px;cursor:pointer;" onclick="showPage('walletPage')">رجوع</p>
+        </div>
+    </div>
+
+    <!-- Profile Page -->
+    <div class="container page" id="profilePage">
+        <div class="card">
+            <h2 style="text-align:center;">الملف الشخصي</h2>
+            <div style="text-align:center;margin:20px 0;"><div style="width:100px;height:100px;background:#eee;border-radius:50%;margin:0 auto;"></div><h3 style="margin-top:10px;" id="profileName"></h3></div>
+            <div class="input-field" id="profileEmail"></div>
+            <div class="input-field" id="profilePhone"></div>
+            <div class="input-field" id="profileWallet"></div>
+            <div class="stats-container"><div class="stat-item"><small>إجمالي الإرسال</small><h3 id="totalSent">0</h3></div><div class="stat-item"><small>إجمالي الاستلام</small><h3 id="totalReceived">0</h3></div></div>
+            <button class="btn btn-danger" onclick="logout()">تسجيل الخروج</button>
+            <p style="text-align:center;margin-top:15px;cursor:pointer;" onclick="showPage('walletPage')">رجوع</p>
+        </div>
+    </div>
+
+    <!-- Vote Page -->
+    <div class="container page" id="votePage">
+        <div class="card">
+            <h2 style="text-align:center;">نظام التصويت</n
