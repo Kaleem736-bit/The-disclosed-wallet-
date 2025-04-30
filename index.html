@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محفظة TRX المتكاملة - المستخدم والمسؤول</title>
+    <title>نظام TRX المتكامل - الإدارة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* الأساسيات */
         :root {
             --primary: #6a11cb;
             --secondary: #2575fc;
@@ -17,141 +18,423 @@
             --light: #f8f9fa;
             --radius: 15px;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
-        body { background: var(--light); min-height: 100vh; }
-        .container { max-width: 500px; margin: 0 auto; padding: 20px 20px 80px; }
-        .page { display: none; animation: slideIn 0.3s ease; }
-        .page.active { display: block; }
-        .card { background: white; border-radius: var(--radius); padding: 25px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .input-field { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: var(--radius); margin: 10px 0; transition: all 0.3s; }
-        .input-field:focus { border-color: var(--primary); outline: none; }
-        .btn { display: block; width: 100%; padding: 15px; border: none; border-radius: var(--radius); font-size: 16px; cursor: pointer; transition: all 0.3s; }
-        .btn-primary { background: linear-gradient(45deg, var(--primary), var(--secondary)); color: white; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-warning { background: var(--warning); color: var(--dark); }
-        .nav-tabs { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 15px 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
-        .tab-item { position: relative; text-align: center; padding: 10px 20px; border-radius: var(--radius); cursor: pointer; transition: all 0.3s; }
-        .tab-item.active { background: var(--primary); color: white; }
-        .notification-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; }
-        .transaction-item, .vote-item, .asset-item { background: white; padding: 15px; border-radius: var(--radius); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.3s; }
-        .stats-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0; }
-        .stat-item { background: white; padding: 15px; border-radius: var(--radius); text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .admin-card { background: linear-gradient(45deg, var(--dark), #424242); color: white; }
-        .admin-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        .admin-table th, .admin-table td { padding: 10px; text-align: right; border-bottom: 1px solid #444; }
-        .admin-table th { background-color: rgba(255,255,255,0.1); }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background: var(--light);
+            min-height: 100vh;
+        }
+
+        /* نظام الصفحات */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* كارت الإدارة */
+        .admin-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* جدول المستخدمين */
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .users-table th, .users-table td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+        }
+
+        .users-table th {
+            background: var(--primary);
+            color: white;
+        }
+
+        .users-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        /* مؤشرات الأسعار */
+        .price-up {
+            color: var(--success);
+        }
+
+        .price-down {
+            color: var(--danger);
+        }
+
+        /* تبويبات الإدارة */
+        .admin-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .admin-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .admin-tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* نموذج التحويل الإداري */
+        .admin-transfer-form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: var(--radius);
+            margin: 20px 0;
+        }
+
+        /* رسومات الأسعار */
+        .chart-container {
+            height: 300px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
+    <!-- مكتبة Chart.js للرسومات -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- User and Admin Pages -->
-    <div class="container page" id="loginPage">
-        <div class="card">
-            <h2 style="text-align:center;margin-bottom:20px;">تسجيل الدخول</h2>
-            <input type="text" class="input-field" placeholder="البريد الإلكتروني أو رقم الهاتف" id="loginId">
-            <input type="password" class="input-field" placeholder="كلمة المرور" id="loginPassword">
-            <button class="btn btn-primary" onclick="login()">تسجيل الدخول</button>
-            <p style="text-align:center;margin-top:15px;cursor:pointer;" onclick="showPage('registerPage')">إنشاء حساب جديد</p>
-            <p style="text-align:center;margin-top:10px;cursor:pointer;" onclick="showPage('adminLoginPage')">دخول المسؤول</p>
-        </div>
-    </div>
 
-    <div class="container page" id="registerPage">
-        <div class="card">
-            <h2 style="text-align:center;margin-bottom:20px;">إنشاء حساب جديد</h2>
-            <input type="text" class="input-field" placeholder="الاسم الرباعي" id="fullName">
-            <input type="email" class="input-field" placeholder="البريد الإلكتروني" id="email">
-            <input type="tel" class="input-field" placeholder="رقم الهاتف" id="phone">
-            <input type="password" class="input-field" placeholder="كلمة المرور" id="password">
-            <input type="password" class="input-field" placeholder="تأكيد كلمة المرور" id="confirmPassword">
-            <button class="btn btn-primary" onclick="register()">إنشاء حساب</button>
-            <p style="text-align:center;margin-top:15px;cursor:pointer;" onclick="showPage('loginPage')">لديك حساب؟ تسجيل الدخول</p>
-        </div>
-    </div>
-
-    <div class="container page" id="adminLoginPage">
-        <div class="card">
-            <h2 style="text-align:center;margin-bottom:20px;">دخول المسؤول</h2>
+    <!-- واجهة دخول الإدارة -->
+    <div class="container page active" id="adminLoginPage">
+        <div class="admin-card" style="max-width: 500px;">
+            <h2 style="text-align: center; margin-bottom: 30px;">الدخول للنظام الإداري</h2>
             <input type="password" class="input-field" placeholder="كلمة المرور الإدارية" id="adminPassword">
             <button class="btn btn-primary" onclick="adminLogin()">دخول</button>
-            <p style="text-align:center;margin-top:15px;cursor:pointer;" onclick="showPage('loginPage')">العودة لتسجيل المستخدم</p>
         </div>
     </div>
 
-    <!-- Common Nav Tabs for User Pages -->
-    <div class="nav-tabs" id="userNav">
-        <div class="tab-item active" onclick="showPage('walletPage')"><i class="fas fa-home"></i></div>
-        <div class="tab-item" onclick="showPage('transactionsPage')"><i class="fas fa-exchange-alt"></i></div>
-        <div class="tab-item" onclick="showPage('votePage')"><i class="fas fa-vote-yea"></i></div>
-        <div class="tab-item" onclick="showPage('profilePage')"><i class="fas fa-user"></i></div>
-    </div>
+    <!-- لوحة التحكم الإدارية -->
+    <div class="container page" id="adminDashboardPage">
+        <div class="admin-card">
+            <h2 style="text-align: center; margin-bottom: 30px; color: var(--primary);">
+                <i class="fas fa-crown"></i> لوحة التحكم الإدارية
+            </h2>
 
-    <!-- Wallet Page -->
-    <div class="container page" id="walletPage">
-        <div class="card">
-            <div style="text-align:center;"><h3 id="userName"></h3><p style="color:#666;margin-top:10px;" id="walletAddress"></p></div>
-            <div style="text-align:center;margin:20px 0;"><h2 style="color:var(--primary);" id="balanceTRX">0 TRX</h2><p style="color:#666;" id="balanceUSD">$0.00</p></div>
-            <div class="stats-container">
-                <div class="stat-item"><small>الطاقة</small><h3 id="energyValue">0</h3></div>
-                <div class="stat-item"><small>النطاق</small><h3 id="bandwidthValue">0</h3></div>
+            <div class="admin-tabs">
+                <div class="admin-tab active" onclick="showAdminTab('users')">إدارة المستخدمين</div>
+                <div class="admin-tab" onclick="showAdminTab('transactions')">المعاملات</div>
+                <div class="admin-tab" onclick="showAdminTab('transfer')">تحويل إداري</div>
+                <div class="admin-tab" onclick="showAdminTab('stats')">الإحصائيات</div>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
-                <button class="btn btn-primary" onclick="showPage('sendPage')">إرسال</button>
-                <button class="btn btn-success" onclick="showPage('receivePage')">استلام</button>
-                <button class="btn btn-primary" onclick="showPage('votePage')">تصويت</button>
-                <button class="btn btn-success" onclick="stakeFunds()">Stake</button>
+
+            <!-- تبويب المستخدمين -->
+            <div id="adminUsersTab" class="admin-tab-content">
+                <h3><i class="fas fa-users"></i> قائمة المستخدمين</h3>
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>الاسم</th>
+                            <th>البريد</th>
+                            <th>رقم الهاتف</th>
+                            <th>عنوان المحفظة</th>
+                            <th>الرصيد (TRX)</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- يتم ملؤها بالجافاسكريبت -->
+                    </tbody>
+                </table>
             </div>
-            <div style="margin-top:20px;"><h4 style="margin-bottom:15px;">الأصول</h4><div class="asset-list" id="assetsList"></div></div>
+
+            <!-- تبويب المعاملات -->
+            <div id="adminTransactionsTab" class="admin-tab-content" style="display: none;">
+                <h3><i class="fas fa-exchange-alt"></i> سجل المعاملات</h3>
+                <div style="margin: 20px 0;">
+                    <input type="text" class="input-field" placeholder="بحث..." id="transactionSearch">
+                </div>
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>المعرف</th>
+                            <th>من</th>
+                            <th>إلى</th>
+                            <th>المبلغ</th>
+                            <th>التاريخ</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsTableBody">
+                        <!-- يتم ملؤها بالجافاسكريبت -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- تبويب التحويل الإداري -->
+            <div id="adminTransferTab" class="admin-tab-content" style="display: none;">
+                <h3><i class="fas fa-money-bill-transfer"></i> تحويل إداري</h3>
+                <div class="admin-transfer-form">
+                    <select class="input-field" id="adminCurrency">
+                        <option value="TRX">TRX</option>
+                        <option value="USDT">USDT</option>
+                        <option value="USDD">USDD</option>
+                        <option value="BTC">Bitcoin</option>
+                        <option value="ETH">Ethereum</option>
+                        <option value="BNB">BNB</option>
+                        <option value="XRP">XRP</option>
+                    </select>
+                    <input type="text" class="input-field" placeholder="عنوان المحفظة المستقبلة" id="adminReceiver">
+                    <input type="number" class="input-field" placeholder="المبلغ" id="adminAmount">
+                    <button class="btn btn-primary" onclick="adminTransfer()">تنفيذ التحويل</button>
+                </div>
+            </div>
+
+            <!-- تبويب الإحصائيات -->
+            <div id="adminStatsTab" class="admin-tab-content" style="display: none;">
+                <h3><i class="fas fa-chart-pie"></i> إحصائيات النظام</h3>
+                
+                <div class="stats-container" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="stat-item">
+                        <small>إجمالي المستخدمين</small>
+                        <h3 id="totalUsers">0</h3>
+                    </div>
+                    <div class="stat-item">
+                        <small>إجمالي المعاملات</small>
+                        <h3 id="totalTransactions">0</h3>
+                    </div>
+                    <div class="stat-item">
+                        <small>إجمالي الأرصدة</small>
+                        <h3 id="totalBalances">0 TRX</h3>
+                    </div>
+                </div>
+
+                <h4 style="margin: 20px 0 10px;">أسعار العملات</h4>
+                <div class="chart-container">
+                    <canvas id="pricesChart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Send Page -->
-    <div class="container page" id="sendPage">
-        <div class="card">
-            <h2 style="text-align:center;margin-bottom:20px;">إرسال أموال</h2>
-            <select class="input-field" id="sendCurrency"><option value="TRX">TRX</option><option value="USDT">USDT</option><option value="USDD">USDD</option></select>
-            <input type="text" class="input-field" placeholder="عنوان المحفظة المستقبلة" id="receiverAddress">
-            <input type="number" class="input-field" placeholder="المبلغ" id="sendAmount">
-            <button class="btn btn-primary" onclick="sendFunds()">إرسال الآن</button>
-            <p style="text-align:center;margin-top:15px;cursor:pointer;" onclick="showPage('walletPage')">رجوع</p>
-        </div>
-    </div>
+    <script>
+        // بيانات النظام
+        const ADMIN_PASSWORD = "12345";
+        let currentAdmin = null;
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        const cryptoPrices = {
+            TRX: { price: 0.07, change: 0 },
+            USDT: { price: 1.00, change: 0 },
+            USDD: { price: 1.00, change: 0 },
+            BTC: { price: 30000, change: 0 },
+            ETH: { price: 2000, change: 0 },
+            BNB: { price: 250, change: 0 },
+            XRP: { price: 0.5, change: 0 }
+        };
 
-    <!-- Receive Page -->
-    <div class="container page" id="receivePage">
-        <div class="card">
-            <h2 style="text-align:center;margin-bottom:20px;">استلام أموال</h2>
-            <div style="text-align:center;margin:20px 0;"><p style="font-weight:bold;" id="receiveAddress"></p><div style="background:#eee;padding:15px;border-radius:var(--radius);margin:20px 0;"><i class="fas fa-qrcode" style="font-size:100px;"></i></div><p style="color:#666;">استخدم هذا العنوان لاستلام الأموال</p></div>
-            <p style="text-align:center;cursor:pointer;" onclick="showPage('walletPage')">رجوع</p>
-        </div>
-    </div>
+        // تحديث أسعار العملات عشوائياً لمحاكاة السوق
+        function updateCryptoPrices() {
+            Object.keys(cryptoPrices).forEach(currency => {
+                const change = (Math.random() * 10 - 5) / 100; // تغيير بين -5% إلى +5%
+                cryptoPrices[currency].price *= (1 + change);
+                cryptoPrices[currency].change = change * 100;
+            });
+            
+            // تحديث الرسم البياني
+            if(window.pricesChart) {
+                window.pricesChart.update();
+            }
+        }
 
-    <!-- Transactions Page -->
-    <div class="container page" id="transactionsPage">
-        <div class="card">
-            <h2 style="text-align:center;">سجل المعاملات</h2>
-            <div style="display:flex;gap:10px;margin:15px 0;"><button class="btn btn-primary" onclick="filterTransactions('all')">الكل</button><button class="btn btn-success" onclick="filterTransactions('received')">الواردة</button><button class="btn btn-danger" onclick="filterTransactions('sent')">الصادرة</button></div>
-            <div id="transactionsContainer"></div>
-            <p style="text-align:center;margin-top:15px;cursor:pointer;" onclick="showPage('walletPage')">رجوع</p>
-        </div>
-    </div>
+        // تسجيل دخول الأدمن
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            if(password === ADMIN_PASSWORD) {
+                currentAdmin = {
+                    walletAddress: "ADMIN_WALLET",
+                    balance: {
+                        TRX: 10000,
+                        USDT: 10000,
+                        USDD: 10000,
+                        BTC: 10000,
+                        ETH: 10000,
+                        BNB: 10000,
+                        XRP: 10000
+                    }
+                };
+                showPage('adminDashboardPage');
+                loadAdminData();
+                initCharts();
+                
+                // تحديث الأسعار كل 10 ثواني
+                setInterval(updateCryptoPrices, 10000);
+            } else {
+                alert('كلمة المرور غير صحيحة!');
+            }
+        }
 
-    <!-- Profile Page -->
-    <div class="container page" id="profilePage">
-        <div class="card">
-            <h2 style="text-align:center;">الملف الشخصي</h2>
-            <div style="text-align:center;margin:20px 0;"><div style="width:100px;height:100px;background:#eee;border-radius:50%;margin:0 auto;"></div><h3 style="margin-top:10px;" id="profileName"></h3></div>
-            <div class="input-field" id="profileEmail"></div>
-            <div class="input-field" id="profilePhone"></div>
-            <div class="input-field" id="profileWallet"></div>
-            <div class="stats-container"><div class="stat-item"><small>إجمالي الإرسال</small><h3 id="totalSent">0</h3></div><div class="stat-item"><small>إجمالي الاستلام</small><h3 id="totalReceived">0</h3></div></div>
-            <button class="btn btn-danger" onclick="logout()">تسجيل الخروج</button>
-            <p style="text-align:center;margin-top:15px;cursor:pointer;" onclick="showPage('walletPage')">رجوع</p>
-        </div>
-    </div>
+        // تحميل بيانات الإدارة
+        function loadAdminData() {
+            // تحميل المستخدمين
+            const usersTable = document.getElementById('usersTableBody');
+            usersTable.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone}</td>
+                    <td>${user.walletAddress}</td>
+                    <td>${user.balance.TRX}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="viewUser('${user.walletAddress}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
 
-    <!-- Vote Page -->
-    <div class="container page" id="votePage">
-        <div class="card">
-            <h2 style="text-align:center;">نظام التصويت</n
+            // تحميل المعاملات
+            const transactionsTable = document.getElementById('transactionsTableBody');
+            transactionsTable.innerHTML = transactions.map(tx => `
+                <tr>
+                    <td>${tx.id}</td>
+                    <td>${tx.from.substring(0, 6)}...${tx.from.substring(tx.from.length-4)}</td>
+                    <td>${tx.to.substring(0, 6)}...${tx.to.substring(tx.to.length-4)}</td>
+                    <td>${tx.amount} ${tx.currency}</td>
+                    <td>${new Date(tx.date).toLocaleString()}</td>
+                    <td>${tx.status}</td>
+                </tr>
+            `).join('');
+
+            // تحديث الإحصائيات
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('totalTransactions').textContent = transactions.length;
+            const totalBalance = users.reduce((sum, user) => sum + user.balance.TRX, 0);
+            document.getElementById('totalBalances').textContent = totalBalance + ' TRX';
+        }
+
+        // التحويل الإداري
+        function adminTransfer() {
+            const currency = document.getElementById('adminCurrency').value;
+            const receiver = document.getElementById('adminReceiver').value;
+            const amount = parseFloat(document.getElementById('adminAmount').value);
+
+            if(!receiver || !amount) return alert('الرجاء إدخال جميع البيانات');
+
+            const user = users.find(u => u.walletAddress === receiver);
+            if(!user) return alert('المستخدم غير موجود');
+
+            if(currentAdmin.balance[currency] < amount) return alert('الرصيد غير كافي');
+
+            // تنفيذ التحويل
+            currentAdmin.balance[currency] -= amount;
+            user.balance[currency] = (user.balance[currency] || 0) + amount;
+
+            // تسجيل المعاملة
+            const transaction = {
+                id: Date.now(),
+                from: currentAdmin.walletAddress,
+                to: receiver,
+                amount,
+                currency,
+                date: new Date().toLocaleString(),
+                status: 'مكتمل'
+            };
+
+            transactions.push(transaction);
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+
+            alert(`تم تحويل ${amount} ${currency} بنجاح!`);
+            loadAdminData();
+        }
+
+        // عرض تبويبات الإدارة
+        function showAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab-content').forEach(tab => tab.style.display = 'none');
+            document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Tab`).style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        // عرض تفاصيل المستخدم
+        function viewUser(walletAddress) {
+            const user = users.find(u => u.walletAddress === walletAddress);
+            if(user) {
+                alert(`
+                    اسم المستخدم: ${user.name}
+                    البريد: ${user.email}
+                    الهاتف: ${user.phone}
+                    عنوان المحفظة: ${user.walletAddress}
+                    الأرصدة:
+                    - TRX: ${user.balance.TRX}
+                    - USDT: ${user.balance.USDT || 0}
+                    - USDD: ${user.balance.USDD || 0}
+                `);
+            }
+        }
+
+        // تهيئة الرسومات البيانية
+        function initCharts() {
+            const ctx = document.getElementById('pricesChart').getContext('2d');
+            window.pricesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(cryptoPrices),
+                    datasets: [{
+                        label: 'السعر الحالي ($)',
+                        data: Object.values(cryptoPrices).map(c => c.price),
+                        backgroundColor: Object.values(cryptoPrices).map(c => 
+                            c.change >= 0 ? 'rgba(40, 167, 69, 0.7)' : 'rgba(220, 53, 69, 0.7)'
+                        ),
+                        borderColor: Object.values(cryptoPrices).map(c => 
+                            c.change >= 0 ? 'rgba(40, 167, 69, 1)' : 'rgba(220, 53, 69, 1)'
+                        ),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // إظهار الصفحة المطلوبة
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // تحديث الأسعار أول مرة
+        updateCryptoPrices();
+    </script>
+</body>
+    </html>
